@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Interactive physics demo: Connect potential, field, force and energy."><title>Electric Potential Landscape Explorer</title><style>:root{color-scheme:light;--ink:#183149;--muted:#52677a;--blue:#176b86;--line:#d7e2e9;--paper:#fff;--bg:#eef4f7}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,Segoe UI,sans-serif}header{padding:24px max(20px,calc((100vw - 1440px)/2));background:#14384d;color:white}header p{margin:5px 0 0;color:#cfe2eb}h1{font-size:clamp(24px,3vw,34px);margin:5px 0;line-height:1.2}nav{font-size:14px;display:flex;gap:18px;flex-wrap:wrap}nav a{color:#d6eef4;text-underline-offset:4px}main{max-width:1480px;margin:auto;padding:22px;display:grid;grid-template-columns:minmax(0,1fr) 292px;gap:20px;align-items:start}.plots{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}.card,.controls{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:18px;box-shadow:0 3px 12px #163b4e06}h2{font-size:18px;margin:0 0 8px}h3{font-size:15px;margin:16px 0 6px}p{margin:8px 0}.hint,.small{font-size:13px;color:var(--muted)}canvas{width:100%;height:auto;display:block;border-radius:6px}canvas.interactive{touch-action:none;cursor:crosshair}#surface{cursor:grab}.control{margin:15px 0 20px}.control label{display:block;font-weight:600;font-size:14px;margin-bottom:7px}.control .entry{display:grid;grid-template-columns:1fr 88px;gap:12px;align-items:center}input[type=range]{width:100%;accent-color:var(--blue)}input[type=number],select{font:inherit;width:100%;padding:6px 8px;border:1px solid #a9bbc7;border-radius:6px;background:white;color:var(--ink)}input[type=number]{font-size:14px}button{font:600 14px system-ui;cursor:pointer;background:var(--blue);color:white;border:0;border-radius:7px;padding:11px 15px;margin:5px 0}button.secondary{background:#e6f0f4;color:#174d65}button:focus-visible,input:focus-visible,select:focus-visible,a:focus-visible,summary:focus-visible{outline:3px solid #d68218;outline-offset:3px}.controls button{width:100%}input:disabled{opacity:.45;cursor:not-allowed}.metrics{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:12px 0}.metric{padding:9px 11px;border-radius:8px;background:#f1f6f8;min-width:0}.metric span{display:block;font-size:12px;color:var(--muted)}.metric strong{font-size:18px;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}.equation{font-family:Georgia,serif;font-size:18px;margin:12px 0}.badge{display:inline-block;background:#ddefef;color:#116065;border-radius:6px;padding:4px 9px;font-size:12px;font-weight:700;letter-spacing:.04em}.warning{color:#8a3517;background:#fff2e8;border-radius:7px;padding:10px}.wide{grid-column:1/-1}details{padding:12px 0;border-top:1px solid var(--line)}summary{cursor:pointer;font-weight:600}ul,ol{padding-left:22px}li{margin:7px 0}footer{max-width:1480px;margin:0 auto;padding:0 22px 24px;font-size:13px;color:var(--muted)}.home{display:block;max-width:900px}.home .card{margin:18px 0}.home a{color:#146782}.home h2 a{text-decoration:none}.home h2 a:hover{text-decoration:underline}@media(max-width:1050px){main{grid-template-columns:1fr}.controls{grid-row:1}.control-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:24px}.controls .control{margin:10px 0}.controls button{width:auto;margin-right:10px}}@media(max-width:650px){main{padding:12px;gap:12px}.plots{grid-template-columns:1fr}.card,.controls{padding:14px}.control-grid{grid-template-columns:1fr}.metrics{gap:6px}.metric strong{font-size:16px}header{padding:18px}.wide{grid-column:auto}}@media print{header{background:white;color:black}header p,nav a{color:black}main{display:block}.controls{display:none}.plots{break-inside:avoid}.card{box-shadow:none}footer{display:none}}
+</style></head><body><header><nav aria-label="Demo navigation"><a href="index.html">All demos</a><a href="PotentialLandscapeExplorer.html">Potential landscape</a><a href="ParallelPlateCapacitorExplorer.html">Parallel-plate capacitor</a></nav><h1>Electric Potential Landscape Explorer</h1><p>Connect potential, field, force and energy.</p></header><main>
+<section class="plots" aria-label="Potential visualizations">
+ <article class="card"><h2>Potential surface</h2><p class="hint">Drag to rotate, or focus the surface and use arrow keys. Height is limited near charges.</p><canvas id="surface" class="interactive" tabindex="0" width="600" height="360" data-w="600" data-h="360" aria-label="Rotatable potential surface; peaks near positive charges and valleys near negative charges. Use arrow keys to rotate."></canvas><button id="resetView" class="secondary">Reset view</button></article>
+ <article class="card"><h2>Equipotentials &amp; field direction</h2><p class="hint">Click or drag to move the yellow probe. White square: reference (0, 1.5 m).</p><canvas id="map" class="interactive" width="600" height="470" data-w="600" data-h="470" aria-label="Potential color map with equipotential contours and electric field direction arrows. Probe position can also be set in the controls."></canvas><p class="hint">Equal-length arrows show direction only. Dashed line marks the slice.</p></article>
+ <article class="card"><h2 id="sliceTitle">Potential slice</h2><p class="hint">Dashed orange tangent: slope = −Eₓ. Slice values are not height-limited.</p><canvas id="slice" width="600" height="360" data-w="600" data-h="360" aria-label="Potential versus x along the selected y, with a tangent at the probe."></canvas></article>
+ <article class="card"><h2>Probe &amp; physics</h2><p id="excluded" class="warning" hidden>Probe is within 0.08 m of an active source. Move it outside the excluded point-charge region.</p><div id="metrics" class="metrics"></div><p id="forceNote" class="small"></p><p class="equation">V = k Σ qᵢ/rᵢ + V₀<br>E = −∇V &nbsp; · &nbsp; F = q<sub>test</sub>E<br>U = q<sub>test</sub>V &nbsp; · &nbsp; W<sub>field</sub> = q<sub>test</sub>(V<sub>ref</sub> − V)</p><p class="small">A reference shift changes V and U but leaves ΔV, E, force and work unchanged.</p></article>
+ <article class="card wide"><details><summary>Model assumptions &amp; questions to explore</summary><p>Two fixed point charges are at (−d/2, 0) and (+d/2, 0). The test charge does not alter the source charges. Regions within 0.08 m of active sources are excluded to avoid singularities; these holes are not conducting spheres. The single-charge preset retains the left source at −d/2.</p><p>The surface height and color scale are limited; probe and slice values use the unclipped model. Read the numeric field strength rather than arrow length. With both sources at zero, the potential is the constant V₀ and the field is zero.</p><ol><li>For a dipole, can V be zero where E is nonzero?</li><li>For two equal positive charges, can E be zero where V is nonzero?</li><li>Shift V₀. Which readouts change, and which do not?</li><li>Reverse the test charge. What happens to force direction, energy and work?</li></ol></details></article>
+</section>
+<aside class="controls" aria-label="Potential controls"><h2>Explore the landscape</h2><label for="preset">Charge configuration</label><select id="preset"><option value="dipole">Electric dipole</option><option value="single">Single positive charge</option><option value="positive">Equal positive charges</option><option value="negative">Equal negative charges</option><option value="custom">Custom</option></select><div id="controlGrid" class="control-grid"></div><button id="reset">Reset to dipole</button><p class="small">Use sliders, arrow keys, or numeric entries. Work is from the white reference point to the probe.</p></aside>
+</main><noscript><p class="warning">Enable JavaScript to use this interactive physics demo.</p></noscript><footer>Base SI units; display prefixes are labeled. Runs locally in your browser. No sign-in or data collection.</footer><script>
+'use strict';
+const K=8.9875517923e9, EPS0=8.8541878128e-12;
+const $=id=>document.getElementById(id);
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const fmt=v=>!Number.isFinite(v)?'—':Math.abs(v)<1e-13?'0':Number(v.toPrecision(4)).toString();
+function fieldModel(x,y,q,d,v0=0,hole=.08){
+ let V=v0,Ex=0,Ey=0;
+ for(let j=0;j<2;j++){
+  if(q[j]===0)continue;
+  const dx=x-(j-.5)*d,r=Math.hypot(dx,y);
+  if(r<hole)return {V:NaN,Ex:NaN,Ey:NaN};
+  V+=K*q[j]/r;Ex+=K*q[j]*dx/r**3;Ey+=K*q[j]*y/r**3;
+ }
+ return {V,Ex,Ey};
+}
+function capacitorModel(A,d,er,vb,connected,Q){
+ const C=EPS0*er*A/d,V=connected?vb:Q/C,q=connected?C*vb:Q,E=V/d,U=.5*C*V*V,u=.5*EPS0*er*E*E;
+ return {C,V,Q:q,E,U,u,F:u*A};
+}
+function slider(id,label,min,max,step,value,unit=''){
+ const wrap=document.createElement('div');wrap.className='control';
+ wrap.innerHTML=`<label for="${id}">${label}${unit?' ('+unit+')':''}</label><div class="entry"><input type="range" id="${id}" min="${min}" max="${max}" step="${step}" value="${value}"><input type="number" id="${id}Number" aria-label="${label}${unit?' in '+unit:''}, numeric entry" min="${min}" max="${max}" step="${step}" value="${value}"></div>`;
+ $('controlGrid').append(wrap);
+ const range=$(id),num=$(id+'Number');
+ range.addEventListener('input',()=>{num.value=range.value;onControl(id)});
+ num.addEventListener('change',()=>{let v=Number(num.value);if(num.value===''||!Number.isFinite(v))v=Number(range.value);range.value=clamp(v,min,max);num.value=range.value;onControl(id)});
+}
+function value(id){return Number($(id).value)}
+function setValue(id,v){$(id).value=v;$(id+'Number').value=$(id).value}
+function metric(label,v,unit){return `<div class="metric"><span>${label}</span><strong>${fmt(v)} ${unit}</strong></div>`}
+function canvasContext(id){
+ const c=$(id),w=Number(c.dataset.w||600),h=Number(c.dataset.h||360),dpr=Math.min(window.devicePixelRatio||1,2),scale=c.getBoundingClientRect().width/w;
+ c.width=Math.max(1,Math.round(w*scale*dpr));c.height=Math.max(1,Math.round(h*scale*dpr));
+ const ctx=c.getContext('2d');ctx.setTransform(c.width/w,0,0,c.height/h,0,0);ctx.clearRect(0,0,w,h);ctx.font='14px system-ui';ctx.lineWidth=1;return {c,ctx,w,h};
+}
+function text(ctx,s,x,y,color='#52677a',align='center'){ctx.fillStyle=color;ctx.textAlign=align;ctx.fillText(s,x,y)}
+function arrow(ctx,x,y,dx,dy,color='#173d4e',width=1.5){
+ const L=Math.hypot(dx,dy);if(!Number.isFinite(L)||L<.01)return;
+ const a=Math.atan2(dy,dx),head=Math.min(6,L*.4);ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+dx,y+dy);ctx.moveTo(x+dx-head*Math.cos(a-.5),y+dy-head*Math.sin(a-.5));ctx.lineTo(x+dx,y+dy);ctx.lineTo(x+dx-head*Math.cos(a+.5),y+dy-head*Math.sin(a+.5));ctx.strokeStyle=color;ctx.lineWidth=width;ctx.stroke();ctx.lineWidth=1;
+}
+function plotAxes(ctx,w,h,xmin,xmax,ymin,ymax,xlabel,ylabel){
+ const L=74,R=w-22,T=22,B=h-58,tx=x=>L+(x-xmin)/(xmax-xmin)*(R-L),ty=y=>B-(y-ymin)/(ymax-ymin)*(B-T);
+ ctx.font='13px system-ui';
+ for(let i=0;i<=4;i++){
+  const x=xmin+(xmax-xmin)*i/4,y=ymin+(ymax-ymin)*i/4;
+  ctx.strokeStyle='#dce6ec';ctx.beginPath();ctx.moveTo(tx(x),T);ctx.lineTo(tx(x),B);ctx.moveTo(L,ty(y));ctx.lineTo(R,ty(y));ctx.stroke();
+  text(ctx,fmt(x),tx(x),B+21);text(ctx,fmt(y),L-9,ty(y)+4,'#52677a','right');
+ }
+ ctx.strokeStyle='#8ca5b4';ctx.strokeRect(L,T,R-L,B-T);text(ctx,xlabel,(L+R)/2,h-11);
+ ctx.save();ctx.translate(15,(T+B)/2);ctx.rotate(-Math.PI/2);text(ctx,ylabel,0,0);ctx.restore();
+ return {tx,ty,L,R,T,B};
+}
+function linePlot(ctx,pts,tx,ty,color='#176b86',width=2){ctx.beginPath();let pen=false;for(const [x,y] of pts){if(!Number.isFinite(y)){pen=false;continue}if(pen)ctx.lineTo(tx(x),ty(y));else{ctx.moveTo(tx(x),ty(y));pen=true}}ctx.strokeStyle=color;ctx.lineWidth=width;ctx.stroke();ctx.lineWidth=1}
+function dot(ctx,x,y,color='#ffcd47',r=6){ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fillStyle=color;ctx.fill();ctx.strokeStyle='#183149';ctx.stroke()}
+function color(t){t=clamp(t,0,1);const stops=[[36,61,131],[22,153,166],[248,216,79]],i=t<.5?0:1,u=(t-i*.5)*2;return stops[i].map((c,j)=>Math.round(c+(stops[i+1][j]-c)*u))}
+function cssColor(t){return `rgb(${color(t).join(',')})`}
+let pending=false;
+function schedule(){if(pending)return;pending=true;requestAnimationFrame(()=>{pending=false;render()})}
+window.addEventListener('resize',schedule);
+function basicSelfTest(){
+ const assert=(v,msg)=>{if(!v)throw Error(msg)},close=(a,b,tol=1e-10)=>Math.abs(a-b)<=tol*Math.max(1,Math.abs(a),Math.abs(b));
+ let m=fieldModel(0,0,[2e-9,2e-9],1);assert(close(m.V,8*K*1e-9)&&m.Ex===0&&m.Ey===0,'equal charges');
+ m=fieldModel(0,0,[2e-9,-2e-9],1);assert(m.V===0&&m.Ex>0&&m.Ey===0,'dipole');
+ const a=fieldModel(.2,.7,[2e-9,-2e-9],1),b=fieldModel(.2,.7,[2e-9,-2e-9],1,50),h=1e-5;
+ assert(close(b.V-a.V,50)&&a.Ex===b.Ex,'reference shift');
+ assert(close(-(fieldModel(.2+h,.7,[2e-9,-2e-9],1).V-fieldModel(.2-h,.7,[2e-9,-2e-9],1).V)/(2*h),a.Ex,1e-7),'gradient');
+ assert(Number.isNaN(fieldModel(-.5,0,[2e-9,0],1).V),'source exclusion');
+ assert(Number.isFinite(fieldModel(.5,0,[2e-9,0],1).V),'inactive source');
+ assert(fieldModel(0,0,[0,0],1,37).V===37,'zero charges');
+ const c=capacitorModel(.02,.002,1,50,true,0),d=capacitorModel(.02,.004,1,50,false,c.Q),e=capacitorModel(.02,.002,4,50,true,0),f=capacitorModel(.02,.002,4,50,false,c.Q);
+ assert(close(d.V/c.V,2)&&close(d.E/c.E,1)&&close(d.U/c.U,2),'isolated gap');
+ assert(close(e.C/c.C,4)&&close(e.E/c.E,1),'connected dielectric');
+ assert(close(f.V/c.V,.25)&&close(f.U/c.U,.25),'isolated dielectric');
+ assert(close(c.U/(c.u*.02*.002),1)&&close(c.F/(c.Q*c.Q/(2*EPS0*.02)),1),'energy and force');
+ const g=capacitorModel(.04,.002,1,50,false,c.Q),i=capacitorModel(.02,.004,1,50,true,0);
+ assert(close(g.V/c.V,.5)&&close(g.E/c.E,.5)&&close(g.U/c.U,.5),'isolated area');
+ assert(close(i.C/c.C,.5)&&close(i.Q/c.Q,.5)&&close(i.E/c.E,.5)&&close(i.U/c.U,.5),'connected gap');
+ return 'Physics self-tests passed';
+}
+
+let azimuth=.72,elevation=.53;
+const mapBox={L:65,T:20,size:380};
+slider('q1','Source charge q₁',-5,5,.01,2,'nC');
+slider('q2','Source charge q₂',-5,5,.01,-2,'nC');
+slider('sep','Source separation',.2,1.6,.01,1,'m');
+slider('px','Probe x',-1.9,1.9,.01,0,'m');
+slider('py','Probe y / slice y',-1.9,1.9,.01,.65,'m');
+slider('qt','Test charge',-5,5,.01,1,'nC');
+slider('offset','Potential reference shift',-100,100,.1,0,'V');
+function onControl(id){if(id==='q1'||id==='q2')$('preset').value='custom';schedule()}
+$('preset').addEventListener('change',()=>{const pairs={dipole:[2,-2],single:[2,0],positive:[2,2],negative:[-2,-2]};const p=pairs[$('preset').value];if(p){setValue('q1',p[0]);setValue('q2',p[1])}schedule()});
+$('reset').addEventListener('click',()=>{for(const [id,v] of Object.entries({q1:2,q2:-2,sep:1,px:0,py:.65,qt:1,offset:0}))setValue(id,v);$('preset').value='dipole';azimuth=.72;elevation=.53;schedule()});
+$('resetView').addEventListener('click',()=>{azimuth=.72;elevation=.53;schedule()});
+function state(){return {q:[value('q1')*1e-9,value('q2')*1e-9],d:value('sep'),v0:value('offset'),x:value('px'),y:value('py'),qt:value('qt')}}
+function sample(s,x,y,hole=.08){return fieldModel(x,y,s.q,s.d,s.v0,hole)}
+function drawMap(s,bound){
+ const {ctx}=canvasContext('map'),{L,T,size}=mapBox,tx=x=>L+(x+2)/4*size,ty=y=>T+(2-y)/4*size,N=80;
+ const grid=[];
+ for(let j=0;j<=N;j++){grid[j]=[];for(let i=0;i<=N;i++)grid[j][i]=sample(s,-2+4*i/N,2-4*j/N).V}
+ ctx.fillStyle='#e5ebef';ctx.fillRect(L,T,size,size);
+ for(let j=0;j<N;j++)for(let i=0;i<N;i++){
+  const v=sample(s,-2+4*(i+.5)/N,2-4*(j+.5)/N).V;if(!Number.isFinite(v))continue;
+  ctx.fillStyle=cssColor((v-s.v0+bound)/(2*bound));ctx.fillRect(L+i*size/N,T+j*size/N,size/N+.5,size/N+.5);
+ }
+ // Marching squares: contours are calculated from the unclipped potential.
+ ctx.save();ctx.beginPath();ctx.rect(L,T,size,size);ctx.clip();
+ for(let n=1;n<20;n++){
+  const level=s.v0-bound+2*bound*n/20;ctx.beginPath();
+  for(let j=0;j<N;j++)for(let i=0;i<N;i++){
+   const v=[grid[j][i],grid[j][i+1],grid[j+1][i+1],grid[j+1][i]];
+   if(v.some(z=>!Number.isFinite(z)))continue;
+   const xy=[[i,j],[i+1,j],[i+1,j+1],[i,j+1]],hits=[];
+   for(let e=0;e<4;e++){const f=(e+1)%4;if((v[e]<level)===(v[f]<level))continue;const t=(level-v[e])/(v[f]-v[e]);hits.push([L+(xy[e][0]+t*(xy[f][0]-xy[e][0]))*size/N,T+(xy[e][1]+t*(xy[f][1]-xy[e][1]))*size/N,e])}
+   if(hits.length===2){ctx.moveTo(hits[0][0],hits[0][1]);ctx.lineTo(hits[1][0],hits[1][1])}
+   if(hits.length===4){const center=v.reduce((a,b)=>a+b,0)/4,match=(center<level)===(v[0]<level),pairs=match?[[0,1],[2,3]]:[[0,3],[1,2]];for(const [a,b] of pairs){ctx.moveTo(hits[a][0],hits[a][1]);ctx.lineTo(hits[b][0],hits[b][1])}}
+  }
+  ctx.strokeStyle=n===10?'#ffffffbb':'#17314966';ctx.lineWidth=n===10?1.6:.7;ctx.stroke();
+ }
+ for(let j=0;j<17;j++)for(let i=0;i<17;i++){
+  const x=-1.9+3.8*i/16,y=-1.9+3.8*j/16,m=sample(s,x,y,.12),mag=Math.hypot(m.Ex,m.Ey);
+  if(mag>1e-10)arrow(ctx,tx(x)-6*m.Ex/mag,ty(y)+6*m.Ey/mag,12*m.Ex/mag,-12*m.Ey/mag,'#09293a',1.1);
+ }
+ ctx.strokeStyle='white';ctx.setLineDash([6,5]);ctx.beginPath();ctx.moveTo(L,ty(s.y));ctx.lineTo(L+size,ty(s.y));ctx.stroke();ctx.setLineDash([]);
+ ctx.restore();
+ for(let j=0;j<2;j++)if(s.q[j]!==0){dot(ctx,tx((j-.5)*s.d),ty(0),s.q[j]>0?'#d73945':'#305cce',10);ctx.font='bold 17px system-ui';text(ctx,s.q[j]>0?'+':'−',tx((j-.5)*s.d),ty(0)+6,'white')}
+ ctx.fillStyle='white';ctx.fillRect(tx(0)-5,ty(1.5)-5,10,10);ctx.strokeStyle='#183149';ctx.strokeRect(tx(0)-5,ty(1.5)-5,10,10);
+ dot(ctx,tx(s.x),ty(s.y));
+ ctx.font='13px system-ui';ctx.strokeStyle='#52677a';ctx.strokeRect(L,T,size,size);
+ for(let t=-2;t<=2;t++){text(ctx,String(t),tx(t),T+size+23);text(ctx,String(t),L-10,ty(t)+4,'#52677a','right')}
+ text(ctx,'x (m)',L+size/2,T+size+49);ctx.save();ctx.translate(17,T+size/2);ctx.rotate(-Math.PI/2);text(ctx,'y (m)',0,0);ctx.restore();
+ const bx=478,bw=18;
+ for(let i=0;i<size;i++){ctx.fillStyle=cssColor(1-i/size);ctx.fillRect(bx,T+i,bw,1.2)}
+ for(let i=0;i<5;i++)text(ctx,fmt(s.v0+bound-bound*i/2),bx+bw+7,T+i*size/4+4,'#52677a','left');
+ text(ctx,'V (V)',bx+16,T+size+34);
+}
+function drawSurface(s,bound){
+ const {ctx,w,h}=canvasContext('surface'),ca=Math.cos(azimuth),sa=Math.sin(azimuth),ce=Math.cos(elevation),se=Math.sin(elevation);
+ const project=(x,y,z)=>{const a=x*ca-y*sa,b=x*sa+y*ca;return [w*.5+a*64,h*.54-b*64*se-z*80*ce]};
+ const N=42,cells=[];
+ for(let j=0;j<N;j++)for(let i=0;i<N;i++){
+  const x=-2+4*i/N,y=-2+4*j/N,step=4/N,coords=[[x,y],[x+step,y],[x+step,y+step],[x,y+step]],vs=coords.map(([a,b])=>sample(s,a,b).V);
+  if(vs.some(v=>!Number.isFinite(v)))continue;
+  const pts=coords.map(([a,b],k)=>project(a,b,clamp((vs[k]-s.v0)/bound,-1,1))),average=vs.reduce((a,b)=>a+b,0)/4;
+  cells.push({pts,depth:(x+step/2)*sa+(y+step/2)*ca,color:cssColor((average-s.v0+bound)/(2*bound))});
+ }
+ ctx.strokeStyle='#bdcdd7';
+ for(let t=-2;t<=2;t++)for(const pts of [[project(t,-2,-1),project(t,2,-1)],[project(-2,t,-1),project(2,t,-1)]]){ctx.beginPath();ctx.moveTo(...pts[0]);ctx.lineTo(...pts[1]);ctx.stroke()}
+ cells.sort((a,b)=>b.depth-a.depth);
+ for(const cell of cells){ctx.beginPath();ctx.moveTo(...cell.pts[0]);for(let k=1;k<4;k++)ctx.lineTo(...cell.pts[k]);ctx.closePath();ctx.fillStyle=cell.color;ctx.fill();ctx.strokeStyle=cell.color;ctx.lineWidth=.5;ctx.stroke()}
+ const origin=project(-2,-2,-1),xt=project(2,-2,-1),yt=project(-2,2,-1),zt=project(-2,-2,1);
+ for(const [end,label] of [[xt,'x (m)'],[yt,'y (m)'],[zt,'V (V)']]){arrow(ctx,...origin,end[0]-origin[0],end[1]-origin[1],'#52677a',1);text(ctx,label,end[0],end[1]-10)}
+ ctx.font='12px system-ui';text(ctx,`Displayed V: ${fmt(s.v0-bound)} to ${fmt(s.v0+bound)} V`,w/2,h-12);
+}
+function drawSlice(s,m){
+ const {ctx,w,h}=canvasContext('slice'),pts=Array.from({length:601},(_,i)=>{const x=-2+4*i/600;return [x,sample(s,x,s.y).V]}),finite=pts.map(p=>p[1]).filter(Number.isFinite);
+ let ymin=Math.min(...finite),ymax=Math.max(...finite);if(Number.isFinite(m.V)){ymin=Math.min(ymin,m.V);ymax=Math.max(ymax,m.V)}
+ const pad=Math.max(1,(ymax-ymin)*.1);ymin-=pad;ymax+=pad;
+ const {tx,ty,L,R,T,B}=plotAxes(ctx,w,h,-2,2,ymin,ymax,'x (m)','V (V)');
+ ctx.save();ctx.beginPath();ctx.rect(L,T,R-L,B-T);ctx.clip();linePlot(ctx,pts,tx,ty);
+ if(Number.isFinite(m.V)){
+  ctx.setLineDash([5,4]);linePlot(ctx,[[s.x-.2,m.V+m.Ex*.2],[s.x+.2,m.V-m.Ex*.2]],tx,ty,'#be7020',1.6);ctx.setLineDash([]);dot(ctx,tx(s.x),ty(m.V));
+ }
+ ctx.restore();$('sliceTitle').textContent=`Potential along y = ${fmt(s.y)} m`;
+}
+function render(){
+ const s=state(),m=sample(s,s.x,s.y),ref=sample(s,0,1.5),bound=Math.max(10,K*s.q.reduce((sum,q)=>sum+Math.abs(q),0)/.3),mag=Math.hypot(m.Ex,m.Ey);
+ drawSurface(s,bound);drawMap(s,bound);drawSlice(s,m);
+ $('excluded').hidden=Number.isFinite(m.V);
+ $('metrics').innerHTML=metric('Potential V',m.V,'V')+metric('V − Vref',m.V-ref.V,'V')+metric('Field Ex',m.Ex,'N/C')+metric('Field Ey',m.Ey,'N/C')+metric('Field strength |E|',mag,'N/C')+metric('Force magnitude |F|',Math.abs(s.qt)*mag,'nN')+metric('Potential energy qV',s.qt*m.V,'nJ')+metric('Field work: ref → probe',s.qt*(ref.V-m.V),'nJ');
+ $('forceNote').textContent=s.qt===0?'A zero test charge feels no electric force.':s.qt>0?'Positive test charge: force points along E.':'Negative test charge: force points opposite E.';
+}
+let mapDrag=false;
+function moveProbe(e){const r=$('map').getBoundingClientRect(),x=(e.clientX-r.left)*600/r.width,y=(e.clientY-r.top)*470/r.height,{L,T,size}=mapBox;if(x<L||x>L+size||y<T||y>T+size)return;setValue('px',clamp((x-L)/size*4-2,-1.9,1.9));setValue('py',clamp(2-(y-T)/size*4,-1.9,1.9));schedule()}
+$('map').addEventListener('pointerdown',e=>{mapDrag=true;$('map').setPointerCapture(e.pointerId);moveProbe(e)});
+$('map').addEventListener('pointermove',e=>{if(mapDrag)moveProbe(e)});
+for(const evt of ['pointerup','pointercancel'])$('map').addEventListener(evt,()=>{mapDrag=false});
+let orbit=null;
+$('surface').addEventListener('pointerdown',e=>{orbit={x:e.clientX,y:e.clientY};$('surface').setPointerCapture(e.pointerId)});
+$('surface').addEventListener('pointermove',e=>{if(!orbit)return;azimuth+=(e.clientX-orbit.x)*.008;elevation=clamp(elevation-(e.clientY-orbit.y)*.006,.18,1.15);orbit={x:e.clientX,y:e.clientY};schedule()});
+for(const evt of ['pointerup','pointercancel'])$('surface').addEventListener(evt,()=>{orbit=null});
+$('surface').addEventListener('keydown',e=>{if(!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key))return;e.preventDefault();if(e.key==='ArrowLeft')azimuth-=.1;if(e.key==='ArrowRight')azimuth+=.1;if(e.key==='ArrowUp')elevation=clamp(elevation+.08,.18,1.15);if(e.key==='ArrowDown')elevation=clamp(elevation-.08,.18,1.15);schedule()});
+console.info(basicSelfTest());render();
+
+</script></body></html>
