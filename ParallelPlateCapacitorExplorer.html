@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Interactive physics demo: Compare fixed voltage and fixed charge."><title>Parallel-Plate Capacitor Explorer</title><style>:root{color-scheme:light;--ink:#183149;--muted:#52677a;--blue:#176b86;--line:#d7e2e9;--paper:#fff;--bg:#eef4f7}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,Segoe UI,sans-serif}header{padding:24px max(20px,calc((100vw - 1440px)/2));background:#14384d;color:white}header p{margin:5px 0 0;color:#cfe2eb}h1{font-size:clamp(24px,3vw,34px);margin:5px 0;line-height:1.2}nav{font-size:14px;display:flex;gap:18px;flex-wrap:wrap}nav a{color:#d6eef4;text-underline-offset:4px}main{max-width:1480px;margin:auto;padding:22px;display:grid;grid-template-columns:minmax(0,1fr) 292px;gap:20px;align-items:start}.plots{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}.card,.controls{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:18px;box-shadow:0 3px 12px #163b4e06}h2{font-size:18px;margin:0 0 8px}h3{font-size:15px;margin:16px 0 6px}p{margin:8px 0}.hint,.small{font-size:13px;color:var(--muted)}canvas{width:100%;height:auto;display:block;border-radius:6px}canvas.interactive{touch-action:none;cursor:crosshair}#surface{cursor:grab}.control{margin:15px 0 20px}.control label{display:block;font-weight:600;font-size:14px;margin-bottom:7px}.control .entry{display:grid;grid-template-columns:1fr 88px;gap:12px;align-items:center}input[type=range]{width:100%;accent-color:var(--blue)}input[type=number],select{font:inherit;width:100%;padding:6px 8px;border:1px solid #a9bbc7;border-radius:6px;background:white;color:var(--ink)}input[type=number]{font-size:14px}button{font:600 14px system-ui;cursor:pointer;background:var(--blue);color:white;border:0;border-radius:7px;padding:11px 15px;margin:5px 0}button.secondary{background:#e6f0f4;color:#174d65}button:focus-visible,input:focus-visible,select:focus-visible,a:focus-visible,summary:focus-visible{outline:3px solid #d68218;outline-offset:3px}.controls button{width:100%}input:disabled{opacity:.45;cursor:not-allowed}.metrics{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:12px 0}.metric{padding:9px 11px;border-radius:8px;background:#f1f6f8;min-width:0}.metric span{display:block;font-size:12px;color:var(--muted)}.metric strong{font-size:18px;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}.equation{font-family:Georgia,serif;font-size:18px;margin:12px 0}.badge{display:inline-block;background:#ddefef;color:#116065;border-radius:6px;padding:4px 9px;font-size:12px;font-weight:700;letter-spacing:.04em}.warning{color:#8a3517;background:#fff2e8;border-radius:7px;padding:10px}.wide{grid-column:1/-1}details{padding:12px 0;border-top:1px solid var(--line)}summary{cursor:pointer;font-weight:600}ul,ol{padding-left:22px}li{margin:7px 0}footer{max-width:1480px;margin:0 auto;padding:0 22px 24px;font-size:13px;color:var(--muted)}.home{display:block;max-width:900px}.home .card{margin:18px 0}.home a{color:#146782}.home h2 a{text-decoration:none}.home h2 a:hover{text-decoration:underline}@media(max-width:1050px){main{grid-template-columns:1fr}.controls{grid-row:1}.control-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:24px}.controls .control{margin:10px 0}.controls button{width:auto;margin-right:10px}}@media(max-width:650px){main{padding:12px;gap:12px}.plots{grid-template-columns:1fr}.card,.controls{padding:14px}.control-grid{grid-template-columns:1fr}.metrics{gap:6px}.metric strong{font-size:16px}header{padding:18px}.wide{grid-column:auto}}@media print{header{background:white;color:black}header p,nav a{color:black}main{display:block}.controls{display:none}.plots{break-inside:avoid}.card{box-shadow:none}footer{display:none}}
+</style></head><body><header><nav aria-label="Demo navigation"><a href="index.html">All demos</a><a href="PotentialLandscapeExplorer.html">Potential landscape</a><a href="ParallelPlateCapacitorExplorer.html">Parallel-plate capacitor</a></nav><h1>Parallel-Plate Capacitor Explorer</h1><p>Compare fixed voltage and fixed charge.</p></header><main>
+<section class="plots" aria-label="Capacitor visualizations">
+ <article class="card"><h2>Parallel-plate capacitor</h2><p class="hint">Field points from + to −. The two axes use different scales.</p><canvas id="plates" width="600" height="360" data-w="600" data-h="360" aria-label="Side view of square capacitor plates, positive on top, negative on bottom, with downward field arrows."></canvas><p class="hint">Charge symbols and arrow lengths are schematic; their counts do not measure Q or E.</p></article>
+ <article class="card"><h2>Potential inside the gap</h2><p class="hint">Negative plate: V(0) = 0. Positive plate: V(d) = ΔV.</p><canvas id="voltage" width="600" height="360" data-w="600" data-h="360" aria-label="Potential increases linearly from the negative plate to the positive plate."></canvas><p class="hint">Only the region inside the gap is plotted.</p></article>
+ <article class="card"><h2>Uniform electric field</h2><p class="hint">Eᵧ is negative because V increases with y.</p><canvas id="field" width="600" height="360" data-w="600" data-h="360" aria-label="Signed y component of electric field, constant and negative inside the gap."></canvas><p class="equation">Eᵧ = −dV/dy = −ΔV/d</p></article>
+ <article class="card"><h2>Capacitor &amp; physics</h2><span id="condition" class="badge"></span><div id="metrics" class="metrics"></div><p class="equation">C = κε₀A/d &nbsp; · &nbsp; Q = CΔV<br>U = ½C(ΔV)² &nbsp; · &nbsp; |E| = ΔV/d<br>u = ½κε₀E² &nbsp; · &nbsp; F<sub>attraction</sub> = uA</p><ul id="effects" class="small"></ul></article>
+ <article class="card wide"><details><summary>Model assumptions &amp; questions to explore</summary><p>Ideal parallel plates: no fringing or leakage. A homogeneous, linear dielectric fills the entire gap. All adjustments are quasistatic. The force is the ideal plate attraction; dielectric deformation is excluded.</p><p>Disconnecting preserves the instantaneous free charge on each plate. Reconnecting restores the selected battery voltage. At fixed voltage, both battery energy exchange and mechanical work matter; a change in stored energy alone is not the total battery energy transfer.</p><ol><li>Double the gap with the battery connected, then repeat with it disconnected. Compare E and U.</li><li>Increase κ in both states. Why does E respond differently?</li><li>Increase plate area at fixed charge. What happens to ΔV?</li><li>Explain why the field is negative while the potential slope is positive.</li></ol></details></article>
+</section>
+<aside class="controls" aria-label="Capacitor controls"><h2>Explore the capacitor</h2><div id="controlGrid" class="control-grid"></div><button id="battery" aria-pressed="false">Disconnect battery</button><p id="held" class="small"></p><button id="reset" class="secondary">Reset</button><p class="small">κ applies to the entire plate gap. Disconnect first to compare fixed charge with fixed voltage.</p></aside>
+</main><noscript><p class="warning">Enable JavaScript to use this interactive physics demo.</p></noscript><footer>Base SI units; display prefixes are labeled. Runs locally in your browser. No sign-in or data collection.</footer><script>
+'use strict';
+const K=8.9875517923e9, EPS0=8.8541878128e-12;
+const $=id=>document.getElementById(id);
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const fmt=v=>!Number.isFinite(v)?'—':Math.abs(v)<1e-13?'0':Number(v.toPrecision(4)).toString();
+function fieldModel(x,y,q,d,v0=0,hole=.08){
+ let V=v0,Ex=0,Ey=0;
+ for(let j=0;j<2;j++){
+  if(q[j]===0)continue;
+  const dx=x-(j-.5)*d,r=Math.hypot(dx,y);
+  if(r<hole)return {V:NaN,Ex:NaN,Ey:NaN};
+  V+=K*q[j]/r;Ex+=K*q[j]*dx/r**3;Ey+=K*q[j]*y/r**3;
+ }
+ return {V,Ex,Ey};
+}
+function capacitorModel(A,d,er,vb,connected,Q){
+ const C=EPS0*er*A/d,V=connected?vb:Q/C,q=connected?C*vb:Q,E=V/d,U=.5*C*V*V,u=.5*EPS0*er*E*E;
+ return {C,V,Q:q,E,U,u,F:u*A};
+}
+function slider(id,label,min,max,step,value,unit=''){
+ const wrap=document.createElement('div');wrap.className='control';
+ wrap.innerHTML=`<label for="${id}">${label}${unit?' ('+unit+')':''}</label><div class="entry"><input type="range" id="${id}" min="${min}" max="${max}" step="${step}" value="${value}"><input type="number" id="${id}Number" aria-label="${label}${unit?' in '+unit:''}, numeric entry" min="${min}" max="${max}" step="${step}" value="${value}"></div>`;
+ $('controlGrid').append(wrap);
+ const range=$(id),num=$(id+'Number');
+ range.addEventListener('input',()=>{num.value=range.value;onControl(id)});
+ num.addEventListener('change',()=>{let v=Number(num.value);if(num.value===''||!Number.isFinite(v))v=Number(range.value);range.value=clamp(v,min,max);num.value=range.value;onControl(id)});
+}
+function value(id){return Number($(id).value)}
+function setValue(id,v){$(id).value=v;$(id+'Number').value=$(id).value}
+function metric(label,v,unit){return `<div class="metric"><span>${label}</span><strong>${fmt(v)} ${unit}</strong></div>`}
+function canvasContext(id){
+ const c=$(id),w=Number(c.dataset.w||600),h=Number(c.dataset.h||360),dpr=Math.min(window.devicePixelRatio||1,2),scale=c.getBoundingClientRect().width/w;
+ c.width=Math.max(1,Math.round(w*scale*dpr));c.height=Math.max(1,Math.round(h*scale*dpr));
+ const ctx=c.getContext('2d');ctx.setTransform(c.width/w,0,0,c.height/h,0,0);ctx.clearRect(0,0,w,h);ctx.font='14px system-ui';ctx.lineWidth=1;return {c,ctx,w,h};
+}
+function text(ctx,s,x,y,color='#52677a',align='center'){ctx.fillStyle=color;ctx.textAlign=align;ctx.fillText(s,x,y)}
+function arrow(ctx,x,y,dx,dy,color='#173d4e',width=1.5){
+ const L=Math.hypot(dx,dy);if(!Number.isFinite(L)||L<.01)return;
+ const a=Math.atan2(dy,dx),head=Math.min(6,L*.4);ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+dx,y+dy);ctx.moveTo(x+dx-head*Math.cos(a-.5),y+dy-head*Math.sin(a-.5));ctx.lineTo(x+dx,y+dy);ctx.lineTo(x+dx-head*Math.cos(a+.5),y+dy-head*Math.sin(a+.5));ctx.strokeStyle=color;ctx.lineWidth=width;ctx.stroke();ctx.lineWidth=1;
+}
+function plotAxes(ctx,w,h,xmin,xmax,ymin,ymax,xlabel,ylabel){
+ const L=74,R=w-22,T=22,B=h-58,tx=x=>L+(x-xmin)/(xmax-xmin)*(R-L),ty=y=>B-(y-ymin)/(ymax-ymin)*(B-T);
+ ctx.font='13px system-ui';
+ for(let i=0;i<=4;i++){
+  const x=xmin+(xmax-xmin)*i/4,y=ymin+(ymax-ymin)*i/4;
+  ctx.strokeStyle='#dce6ec';ctx.beginPath();ctx.moveTo(tx(x),T);ctx.lineTo(tx(x),B);ctx.moveTo(L,ty(y));ctx.lineTo(R,ty(y));ctx.stroke();
+  text(ctx,fmt(x),tx(x),B+21);text(ctx,fmt(y),L-9,ty(y)+4,'#52677a','right');
+ }
+ ctx.strokeStyle='#8ca5b4';ctx.strokeRect(L,T,R-L,B-T);text(ctx,xlabel,(L+R)/2,h-11);
+ ctx.save();ctx.translate(15,(T+B)/2);ctx.rotate(-Math.PI/2);text(ctx,ylabel,0,0);ctx.restore();
+ return {tx,ty,L,R,T,B};
+}
+function linePlot(ctx,pts,tx,ty,color='#176b86',width=2){ctx.beginPath();let pen=false;for(const [x,y] of pts){if(!Number.isFinite(y)){pen=false;continue}if(pen)ctx.lineTo(tx(x),ty(y));else{ctx.moveTo(tx(x),ty(y));pen=true}}ctx.strokeStyle=color;ctx.lineWidth=width;ctx.stroke();ctx.lineWidth=1}
+function dot(ctx,x,y,color='#ffcd47',r=6){ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fillStyle=color;ctx.fill();ctx.strokeStyle='#183149';ctx.stroke()}
+function color(t){t=clamp(t,0,1);const stops=[[36,61,131],[22,153,166],[248,216,79]],i=t<.5?0:1,u=(t-i*.5)*2;return stops[i].map((c,j)=>Math.round(c+(stops[i+1][j]-c)*u))}
+function cssColor(t){return `rgb(${color(t).join(',')})`}
+let pending=false;
+function schedule(){if(pending)return;pending=true;requestAnimationFrame(()=>{pending=false;render()})}
+window.addEventListener('resize',schedule);
+function basicSelfTest(){
+ const assert=(v,msg)=>{if(!v)throw Error(msg)},close=(a,b,tol=1e-10)=>Math.abs(a-b)<=tol*Math.max(1,Math.abs(a),Math.abs(b));
+ let m=fieldModel(0,0,[2e-9,2e-9],1);assert(close(m.V,8*K*1e-9)&&m.Ex===0&&m.Ey===0,'equal charges');
+ m=fieldModel(0,0,[2e-9,-2e-9],1);assert(m.V===0&&m.Ex>0&&m.Ey===0,'dipole');
+ const a=fieldModel(.2,.7,[2e-9,-2e-9],1),b=fieldModel(.2,.7,[2e-9,-2e-9],1,50),h=1e-5;
+ assert(close(b.V-a.V,50)&&a.Ex===b.Ex,'reference shift');
+ assert(close(-(fieldModel(.2+h,.7,[2e-9,-2e-9],1).V-fieldModel(.2-h,.7,[2e-9,-2e-9],1).V)/(2*h),a.Ex,1e-7),'gradient');
+ assert(Number.isNaN(fieldModel(-.5,0,[2e-9,0],1).V),'source exclusion');
+ assert(Number.isFinite(fieldModel(.5,0,[2e-9,0],1).V),'inactive source');
+ assert(fieldModel(0,0,[0,0],1,37).V===37,'zero charges');
+ const c=capacitorModel(.02,.002,1,50,true,0),d=capacitorModel(.02,.004,1,50,false,c.Q),e=capacitorModel(.02,.002,4,50,true,0),f=capacitorModel(.02,.002,4,50,false,c.Q);
+ assert(close(d.V/c.V,2)&&close(d.E/c.E,1)&&close(d.U/c.U,2),'isolated gap');
+ assert(close(e.C/c.C,4)&&close(e.E/c.E,1),'connected dielectric');
+ assert(close(f.V/c.V,.25)&&close(f.U/c.U,.25),'isolated dielectric');
+ assert(close(c.U/(c.u*.02*.002),1)&&close(c.F/(c.Q*c.Q/(2*EPS0*.02)),1),'energy and force');
+ const g=capacitorModel(.04,.002,1,50,false,c.Q),i=capacitorModel(.02,.004,1,50,true,0);
+ assert(close(g.V/c.V,.5)&&close(g.E/c.E,.5)&&close(g.U/c.U,.5),'isolated area');
+ assert(close(i.C/c.C,.5)&&close(i.Q/c.Q,.5)&&close(i.E/c.E,.5)&&close(i.U/c.U,.5),'connected gap');
+ return 'Physics self-tests passed';
+}
+
+let connected=true,heldQ=NaN;
+slider('area','Plate area',.005,.05,.0001,.02,'m²');
+slider('gap','Plate gap',.5,5,.01,2,'mm');
+slider('er','Dielectric constant κ',1,8,.01,1);
+slider('vb','Battery voltage',5,100,.1,50,'V');
+function onControl(){schedule()}
+function model(){return capacitorModel(value('area'),value('gap')*.001,value('er'),value('vb'),connected,heldQ)}
+$('battery').addEventListener('click',()=>{if(connected)heldQ=model().Q;connected=!connected;schedule()});
+$('reset').addEventListener('click',()=>{for(const [id,v] of Object.entries({area:.02,gap:2,er:1,vb:50}))setValue(id,v);connected=true;heldQ=NaN;schedule()});
+function drawPlates(){
+ const {ctx,w,h}=canvasContext('plates'),gap=value('gap'),side=Math.sqrt(value('area'))*1000,{tx,ty}=plotAxes(ctx,w,h,-125,155,-.65,5.7,'Square-plate width (mm)','y (mm)');
+ const x1=tx(-side/2),x2=tx(side/2),top=ty(gap),bottom=ty(0);
+ ctx.fillStyle='#d9edf3';ctx.fillRect(x1,top,x2-x1,bottom-top);
+ ctx.lineWidth=8;ctx.strokeStyle='#d73945';ctx.beginPath();ctx.moveTo(x1,top);ctx.lineTo(x2,top);ctx.stroke();ctx.strokeStyle='#305cce';ctx.beginPath();ctx.moveTo(x1,bottom);ctx.lineTo(x2,bottom);ctx.stroke();ctx.lineWidth=1;
+ ctx.font='bold 18px system-ui';
+ for(let i=0;i<7;i++){const x=tx(-side*.42+side*.84*i/6);text(ctx,'+',x,top-8,'#ba2532');text(ctx,'−',x,bottom+21,'#305cce')}
+ for(let i=0;i<5;i++){const x=tx(-side*.38+side*.76*i/4);arrow(ctx,x,ty(gap*.8),0,ty(gap*.2)-ty(gap*.8),'#176a50',2)}
+ const bx=tx(side*.58);ctx.strokeStyle='#52677a';ctx.beginPath();ctx.moveTo(bx,top);ctx.lineTo(bx,bottom);ctx.stroke();ctx.font='13px system-ui';text(ctx,`d = ${fmt(gap)} mm`,bx+5,(top+bottom)/2,'#183149','left');
+ ctx.fillStyle='#d9edf3';ctx.fillRect((x1+x2)/2-35,(top+bottom)/2-13,70,25);text(ctx,`κ = ${fmt(value('er'))}`,(x1+x2)/2,(top+bottom)/2+5,'#183149');
+}
+function drawPotential(m){const {ctx,w,h}=canvasContext('voltage'),gap=value('gap'),{tx,ty}=plotAxes(ctx,w,h,0,5,0,Math.max(110,m.V*1.12),'y from negative plate (mm)','V(y) (V)');linePlot(ctx,[[0,0],[gap,m.V]],tx,ty,'#305cce');dot(ctx,tx(gap),ty(m.V),'#d73945',4)}
+function drawField(m){const {ctx,w,h}=canvasContext('field'),gap=value('gap'),{tx,ty}=plotAxes(ctx,w,h,0,5,-Math.max(220,m.E/1000*1.15),10,'y from negative plate (mm)','Ey (kN/C)');linePlot(ctx,[[0,-m.E/1000],[gap,-m.E/1000]],tx,ty,'#176a50');dot(ctx,tx(gap),ty(-m.E/1000),'#176a50',4)}
+function render(){
+ const m=model();$('vb').disabled=!connected;$('vbNumber').disabled=!connected;
+ $('battery').textContent=connected?'Disconnect battery':'Reconnect battery';$('battery').setAttribute('aria-pressed',String(!connected));
+ $('condition').textContent=connected?'BATTERY CONNECTED · FIXED VOLTAGE':'BATTERY DISCONNECTED · FIXED CHARGE';
+ $('held').textContent=connected?'The battery maintains the selected voltage and exchanges charge and energy.':`Isolated charge is held at ${fmt(heldQ*1e9)} nC. Changing battery voltage is disabled until reconnection.`;
+ $('metrics').innerHTML=metric('Capacitance C',m.C*1e12,'pF')+metric('Charge on + plate',m.Q*1e9,'nC')+metric('Potential difference ΔV',m.V,'V')+metric('Field strength |E|',m.E,'N/C')+metric('Stored energy U',m.U*1e9,'nJ')+metric('Attractive force',m.F*1e6,'µN')+metric('Energy density u',m.u,'J/m³')+metric('Charge on − plate',-m.Q*1e9,'nC');
+ $('effects').innerHTML=connected?'<li>Increase gap d: C, Q, U and |E| decrease.</li><li>Increase κ or area A: C, Q and U increase; |E| stays fixed.</li><li>The battery supplies or receives charge.</li>':'<li>Increase gap d: ΔV and U increase; |E| stays fixed.</li><li>Increase κ: ΔV, |E| and U decrease.</li><li>Increase area A: ΔV, |E| and U decrease; Q stays fixed.</li>';
+ drawPlates();drawPotential(m);drawField(m);
+}
+console.info(basicSelfTest());render();
+
+</script></body></html>
